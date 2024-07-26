@@ -1,0 +1,37 @@
+#ddev-generated
+# Simple template to demonstrate addon-template
+services:
+  sitediff:
+    container_name: ddev-${DDEV_SITENAME}-sitediff
+    image: evolvingweb/sitediff
+    working_dir: /var/www/sitediff
+    restart: "no"
+
+    # Sitediff is served from this port inside the container.
+    expose:
+      - 13080
+    command: tail -f /dev/null
+    networks:
+      - default
+      - ddev_default
+    # These labels ensure this service is discoverable by ddev.
+    labels:
+      com.ddev.site-name: ${DDEV_SITENAME}
+      com.ddev.approot: $DDEV_APPROOT
+
+    environment:
+      # This defines the host name the service should be accessible from. This
+      # will be sitename.ddev.site.
+      - VIRTUAL_HOST=$DDEV_HOSTNAME
+      # HTTP_EXPOSE exposes http traffic from the container port 13080
+      # to the host port 13080 vid ddev-router reverse proxy.
+      - HTTP_EXPOSE=13080:13080
+
+    volumes:
+      - "../sitediff:/var/www/sitediff"
+      - ".:/mnt/ddev_config"
+      - "ddev-global-cache:/mnt/ddev-global-cache"
+
+volumes:
+  sitediff:
+    name: "ddev-${DDEV_SITENAME}_sitediff"
